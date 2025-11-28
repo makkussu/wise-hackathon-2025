@@ -21,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,12 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.wise.wisepay.ui.theme.WayPosConfirmScreen
 
 val Forest = Color(0xFF163300)
 val Lime = Color(0xFF9FE870)
@@ -88,12 +87,7 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
 
     override fun onResume() {
         super.onResume()
-        nfcAdapter?.enableReaderMode(
-            this,
-            this,
-            NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK,
-            null
-        )
+        nfcAdapter?.enableReaderMode(this, this, NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK, null)
     }
 
     override fun onPause() {
@@ -119,6 +113,7 @@ fun SimpleNfcApp(
     onSimulateSignal: () -> Unit
 ) {
     var stage by remember { mutableStateOf(AppStage.IDLE) }
+    var amountToPay by remember { mutableStateOf("") }
 
     LaunchedEffect(stage) {
         setScanningState(stage == AppStage.SCANNING)
@@ -133,49 +128,33 @@ fun SimpleNfcApp(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(if (stage == AppStage.IDLE) GrayBg else Forest)
+            .background(if (stage == AppStage.IDLE) White else Forest)
     ) {
         when (stage) {
-            AppStage.IDLE -> IdleScreen { stage = AppStage.SCANNING }
+            AppStage.IDLE -> WayPosConfirmScreen(
+                onConfirm = { amount, currency ->
+                    amountToPay = "$amount $currency"
+                    stage = AppStage.SCANNING
+                }
+            )
             AppStage.SCANNING -> ScanningScreen(
+                amountText = amountToPay,
                 onCancel = { stage = AppStage.IDLE },
                 onSimulateTap = {
                     onSimulateSignal()
                     stage = AppStage.SUCCESS
                 }
             )
-            AppStage.SUCCESS -> SuccessScreen { stage = AppStage.IDLE }
+            AppStage.SUCCESS -> SuccessScreen(
+                amountText = amountToPay,
+                onDone = { stage = AppStage.IDLE }
+            )
         }
     }
 }
 
 @Composable
-fun IdleScreen(onStart: () -> Unit) {
-    Column(
-        Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .size(200.dp)
-                .clip(CircleShape)
-                .background(Forest)
-                .clickable { onStart() },
-            contentAlignment = Alignment.Center
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // Используем PlayArrow, так как это кнопка старта
-                Icon(Icons.Default.PlayArrow, null, tint = Lime, modifier = Modifier.size(64.dp))
-                Spacer(Modifier.height(16.dp))
-                Text("TAP TO START", color = Lime, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-            }
-        }
-    }
-}
-
-@Composable
-fun ScanningScreen(onCancel: () -> Unit, onSimulateTap: () -> Unit) {
+fun ScanningScreen(amountText: String, onCancel: () -> Unit, onSimulateTap: () -> Unit) {
     Column(
         Modifier
             .fillMaxSize()
@@ -188,16 +167,14 @@ fun ScanningScreen(onCancel: () -> Unit, onSimulateTap: () -> Unit) {
                 Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Cancel",
                 tint = White,
-                modifier = Modifier
-                    .size(32.dp)
-                    .clickable { onCancel() }
+                modifier = Modifier.size(32.dp).clickable { onCancel() }
             )
         }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             PulsingIcon()
             Spacer(Modifier.height(48.dp))
-            Text("Ready to Scan", color = White, fontSize = 32.sp, fontWeight = FontWeight.Bold)
+            Text("Pay $amountText", color = White, fontSize = 32.sp, fontWeight = FontWeight.Bold)
             Text("Hold card to back of device", color = Lime, fontSize = 16.sp, modifier = Modifier.padding(top = 16.dp))
         }
 
@@ -206,7 +183,7 @@ fun ScanningScreen(onCancel: () -> Unit, onSimulateTap: () -> Unit) {
 }
 
 @Composable
-fun SuccessScreen(onDone: () -> Unit) {
+fun SuccessScreen(amountText: String, onDone: () -> Unit) {
     Column(
         Modifier
             .fillMaxSize()
@@ -222,6 +199,7 @@ fun SuccessScreen(onDone: () -> Unit) {
         )
         Spacer(Modifier.height(32.dp))
         Text("Success!", color = Forest, fontSize = 32.sp, fontWeight = FontWeight.Bold)
+        Text(amountText, color = Forest, fontSize = 24.sp, modifier = Modifier.padding(top = 8.dp))
 
         Spacer(Modifier.height(80.dp))
 
