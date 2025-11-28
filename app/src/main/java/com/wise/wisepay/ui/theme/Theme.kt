@@ -1,4 +1,4 @@
-package com.wise.wisepay.ui.theme
+/*package com.wise.wisepay.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -55,4 +55,4 @@ fun WisePayTheme(
         typography = Typography,
         content = content
     )
-}
+}*/
