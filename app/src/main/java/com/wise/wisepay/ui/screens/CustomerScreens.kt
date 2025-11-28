@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -33,6 +34,7 @@ import com.wise.wisepay.util.CurrencyUtils
 fun CustomerPaymentScreen(
     amount: String,
     currencyCode: String,
+    flagResId: Int
     description: String
 ) {
     val flag = CurrencyUtils.getFlagForCode(currencyCode)
@@ -55,10 +57,20 @@ fun CustomerPaymentScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         Box(
-            modifier = Modifier.size(56.dp).clip(CircleShape).background(White).padding(2.dp).clip(CircleShape),
+            modifier = Modifier
+                .size(64.dp)
+                .clip(CircleShape)
+                .background(White)
+                .padding(2.dp)
+                .clip(CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            Text(flag, fontSize = 32.sp)
+            Image(
+                painter = painterResource(id = flagResId),
+                contentDescription = "Flag",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
         }
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -107,7 +119,10 @@ fun CustomerSuccessView(amount: String, currencyCode: String) {
 @Composable
 fun CustomerErrorScreen(onRetry: () -> Unit, onCancel: () -> Unit) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp).windowInsetsPadding(WindowInsets.safeDrawing)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp)
+            .windowInsetsPadding(WindowInsets.safeDrawing)
     ) {
         Box(Modifier.fillMaxWidth()) {
             IconButton(onClick = onCancel, modifier = Modifier.align(Alignment.CenterStart)) {

@@ -24,13 +24,13 @@ import kotlinx.coroutines.delay
 fun MainAppContent(
     currentState: PosState,
     amount: String,
-    currencyCode: String,
-    description: String,
-    onConfirmInput: (String, String, String) -> Unit,
+    currency: String,
+    onConfirmInput: (String, String, Int) -> Unit,
     onReset: () -> Unit,
     onPaymentSuccess: () -> Unit,
     onPaymentError: () -> Unit,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
+    flagResId: Int
 ) {
     val targetRotation = when (currentState) {
         PosState.INPUT, PosState.MERCHANT_SUCCESS -> 0f
@@ -69,9 +69,15 @@ fun MainAppContent(
             if (currentState == PosState.MERCHANT_SUCCESS) {
                 MerchantSuccessScreen(amount, currencyCode, onReset)
             } else {
-                WayPosConfirmScreen(onConfirm = onConfirmInput)
+                WayPosConfirmScreen(
+                    onConfirm = { amt, curr, flag ->
+                        onConfirmInput(amt, curr, flag)
+                    }
+                )
             }
-        } else {
+        }
+
+        else {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -85,7 +91,8 @@ fun MainAppContent(
                 when (currentState) {
                     PosState.CUSTOMER_SUCCESS, PosState.MERCHANT_SUCCESS -> CustomerSuccessView(amount, currencyCode)
                     PosState.PAYMENT_ERROR, PosState.INPUT -> CustomerErrorScreen(onRetry, onReset)
-                    else -> CustomerPaymentScreen(amount, currencyCode, description)
+
+                    else -> CustomerPaymentScreen(amount, currency, description, flagResId)
                 }
             }
         }

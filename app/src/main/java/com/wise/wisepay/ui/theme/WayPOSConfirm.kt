@@ -1,5 +1,6 @@
 package com.wise.wisepay.ui.theme
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -24,6 +25,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.Paragraph
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +39,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.wise.wisepay.util.CurrencyUtils
 import java.util.Locale
+import java.math.BigDecimal
+import java.math.RoundingMode
+import com.wise.wisepay.R
 
 val WiseForest = Color(0xFF163300)
 val WiseLime = Color(0xFF9FE870)
@@ -46,13 +51,19 @@ val WiseGreyText = Color(0xFFA8AAAC)
 
 val InterFont = FontFamily.SansSerif
 
+data class Currency(val code: String, val flag: Int, val symbol: String, val rate: Double)
+
+val currenciesList = listOf(
+    Currency(code = "GBP", flag = R.drawable.flag_gbp, symbol = "£", rate = 0.79),
+    Currency(code = "EUR", flag = R.drawable.flag_eu, symbol = "€", rate = 0.92),
+    Currency(code = "USD", flag = R.drawable.flag_us, symbol = "$", rate = 1.0),
+)
+
 @Composable
-fun WayPosConfirmScreen(
-    onConfirm: (String, String, String) -> Unit
-) {
+fun WayPosConfirmScreen(onConfirm: (String, String, Int) -> Unit) {
     var inputString by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    var selectedCurrency by remember { mutableStateOf(CurrencyUtils.currenciesList[1]) }
+    var selectedCurrency by remember { mutableStateOf(currenciesList[1]) }
     var expanded by remember { mutableStateOf(false) }
 
     var isDescriptionFocused by remember { mutableStateOf(false) }
@@ -124,20 +135,48 @@ fun WayPosConfirmScreen(
                             Spacer(Modifier.width(4.dp))
                             Icon(Icons.Default.ArrowDropDown, null, tint = WiseForest)
                         }
+                        Image(
+                            painter = painterResource(id = selectedCurrency.flag),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(selectedCurrency.code, color = WiseForest, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        Spacer(Modifier.width(4.dp))
+                        Icon(Icons.Default.ArrowDropDown, null, tint = WiseForest)
                     }
 
-                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }, modifier = Modifier.background(WiseWhite)) {
-                        CurrencyUtils.currenciesList.forEach { newCurrency ->
-                            DropdownMenuItem(
-                                text = { Text("${newCurrency.flag}  ${newCurrency.code}", color = WiseForest) },
-                                onClick = {
-                                    if (inputString.isNotEmpty()) {
-                                        val currentVal = inputString.toDoubleOrNull() ?: 0.0
-                                        val newVal = (currentVal / selectedCurrency.rate) * newCurrency.rate
-                                        inputString = String.format(Locale.US, "%.2f", newVal).substringBeforeLast(".00")
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.background(WiseWhite)
+                ) {
+                    currenciesList.forEach { newCurrency ->
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Image(
+                                        painter = painterResource(id = newCurrency.flag),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text("${newCurrency.code}", color = WiseForest)
+                                }
+                            },
+                            onClick = {
+                                if (inputString.isNotEmpty()) {
+                                    try {
+                                        val currentVal = BigDecimal(inputString)
+                                        val oldRate = BigDecimal.valueOf(selectedCurrency.rate)
+                                        val newRate = BigDecimal.valueOf(newCurrency.rate)
+
+                                        val baseVal = currentVal.divide(oldRate, 10, RoundingMode.HALF_EVEN)
+                                        val newVal = baseVal.multiply(newRate).setScale(2, RoundingMode.HALF_EVEN)
+
+                                        inputString = newVal.toPlainString()
+                                    } catch (e: Exception) {
                                     }
-                                    selectedCurrency = newCurrency
-                                    expanded = false
                                 }
                             )
                         }
@@ -163,7 +202,7 @@ fun WayPosConfirmScreen(
 
             Box(modifier = Modifier.fillMaxWidth().padding(start = 4.dp)) {
                 if (description.isEmpty()) {
-                    Text("What's this for?", color = WiseGreyText, fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                    Text("Payment details", color = WiseGreyText, fontSize = 18.sp, fontWeight = FontWeight.Medium)
                 }
                 BasicTextField(
                     value = description,
