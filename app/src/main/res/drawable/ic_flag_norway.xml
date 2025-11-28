@@ -1,0 +1,37 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+  <group>
+    <clip-path
+        android:pathData="M0,0h64v64h-64z"/>
+    <path
+        android:pathData="M13.333,6.016C6.632,10.839 1.875,18.185 0.451,26.667H13.333V6.016Z"
+        android:fillColor="#F0263C"/>
+    <path
+        android:pathData="M63.549,26.667C61.009,11.533 47.855,0 32,0C29.238,0 26.557,0.35 24,1.008V26.667L63.549,26.667Z"
+        android:fillColor="#F0263C"/>
+    <path
+        android:pathData="M0.451,37.333C1.875,45.815 6.632,53.161 13.333,57.984V37.333H0.451Z"
+        android:fillColor="#F0263C"/>
+    <path
+        android:pathData="M24,62.992C26.557,63.65 29.238,64 32,64C47.855,64 61.009,52.466 63.549,37.333H24V62.992Z"
+        android:fillColor="#F0263C"/>
+    <path
+        android:pathData="M21.333,34.667V62.172C22.206,62.481 23.094,62.759 24,62.992V37.333H63.549C63.696,36.456 63.806,35.567 63.881,34.667H21.333Z"
+        android:fillColor="#ffffff"/>
+    <path
+        android:pathData="M16,34.667H0.119C0.194,35.567 0.304,36.456 0.451,37.333H13.333V57.984C14.191,58.601 15.081,59.177 16,59.708L16,34.667Z"
+        android:fillColor="#ffffff"/>
+    <path
+        android:pathData="M21.333,29.333H63.881C63.806,28.433 63.696,27.544 63.549,26.667H24V1.008C23.094,1.241 22.206,1.519 21.333,1.828V29.333Z"
+        android:fillColor="#ffffff"/>
+    <path
+        android:pathData="M16,29.333V4.292C15.081,4.823 14.191,5.399 13.333,6.016V26.667H0.451C0.303,27.544 0.193,28.433 0.119,29.333H16Z"
+        android:fillColor="#ffffff"/>
+    <path
+        android:pathData="M21.333,29.333V1.828C19.469,2.487 17.687,3.315 16,4.292V29.333H0.119C0.047,30.213 0,31.101 0,32C0,32.899 0.047,33.786 0.119,34.667H16V59.708C17.687,60.685 19.469,61.513 21.333,62.172V34.667H63.881C63.953,33.787 64,32.899 64,32C64,31.101 63.953,30.214 63.881,29.333L21.333,29.333Z"
+        android:fillColor="#191977"/>
+  </group>
+</vector>

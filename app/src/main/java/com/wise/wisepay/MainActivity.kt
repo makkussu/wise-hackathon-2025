@@ -23,6 +23,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.rounded.ArrowDownward
+import androidx.compose.material.icons.rounded.Euro
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,6 +37,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.wise.wisepay.views.Revenue
+import com.wise.wisepay.views.SampleHome
+import com.wise.wisepay.views.Transaction
 
 val Forest = Color(0xFF163300)
 val Lime = Color(0xFF9FE870)
@@ -53,19 +58,114 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
         super.onCreate(savedInstanceState)
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
 
+        val balanceTest: List<Revenue> = listOf(
+            Revenue(
+                id = "1",
+                name = "EUR",
+                totalSum = 213.45,
+                currency = R.drawable.ic_flag_eu
+            ),
+            Revenue(
+                id = "2",
+                name = "USD",
+                totalSum = 135.89,
+                currency = R.drawable.ic_flag_us
+            ),
+            Revenue(
+                id = "3",
+                name = "NOK",
+                totalSum = 253.61,
+                currency = R.drawable.ic_flag_norway
+            ),
+            Revenue(
+                id = "4",
+                name = "KRW",
+                totalSum = 105086.00,
+                currency = R.drawable.ic_flag_south_korea
+            ),
+        )
+
+        val transactionList = listOf(
+            Transaction(
+                id = "1",
+                sum = 45.50,
+                currency = Icons.Rounded.ArrowDownward,
+                description = "Local berries"
+            ),
+            Transaction(
+                id = "2",
+                sum = 120.00,
+                currency = Icons.Rounded.ArrowDownward,
+                description = "Mobile Phone"
+            ),
+            Transaction(
+                id = "3",
+                sum = 25.75,
+                currency = Icons.Rounded.ArrowDownward,
+                description = "Sweatshirt"
+            ),
+            Transaction(
+                id = "4",
+                sum = 350.00,
+                currency = Icons.Rounded.ArrowDownward,
+                description = "8GB DDR5 RAM"
+            ),
+            Transaction(
+                id = "5",
+                sum = 89.99,
+                currency = Icons.Rounded.ArrowDownward,
+                description = "Online Shopping"
+            ),
+            Transaction(
+                id = "6",
+                sum = 15.00,
+                currency = Icons.Rounded.ArrowDownward,
+                description = "Macha Latte"
+            ),
+            Transaction(
+                id = "7",
+                sum = 200.00,
+                currency = Icons.Rounded.ArrowDownward,
+                description = "Concert Ticket"
+            ),
+            Transaction(
+                id = "8",
+                sum = 50.25,
+                currency = Icons.Rounded.Euro,
+                description = "Shampoo"
+            ),
+            Transaction(
+                id = "9",
+                sum = 12.99,
+                currency = Icons.Rounded.ArrowDownward,
+                description = "Headphones Sale"
+            ),
+            Transaction(
+                id = "10",
+                sum = 75.00,
+                currency = Icons.Rounded.Euro,
+                description = "Gaming Console"
+            )
+        )
+
         setContent {
-            MaterialTheme(
-                typography = Typography(
-                    bodyLarge = TextStyle(fontFamily = InterFont),
-                    displayLarge = TextStyle(fontFamily = InterFont)
-                )
-            ) {
-                SimpleNfcApp(
-                    nfcTrigger = nfcTrigger,
-                    setScanningState = { active -> isReadyToScan = active },
-                    onSimulateSignal = { simulateSignal(this) }
-                )
-            }
+            SampleHome(
+                balanceTest,
+                transactionList
+            )
+
+//            MaterialTheme(
+//                typography = Typography(
+//                    bodyLarge = TextStyle(fontFamily = InterFont),
+//                    displayLarge = TextStyle(fontFamily = InterFont)
+//                )
+//            ) {
+//                SimpleNfcApp(
+//                    nfcTrigger = nfcTrigger,
+//                    setScanningState = { active -> isReadyToScan = active },
+//                    onSimulateSignal = { simulateSignal(this) }
+//                )
+//            }
         }
     }
 
