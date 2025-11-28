@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.sp
 import com.wise.wisepay.ui.components.WiseOutlineButton
 import com.wise.wisepay.ui.components.WisePrimaryButton
 import com.wise.wisepay.ui.theme.*
-import com.wise.wisepay.util.CurrencyUtils
 
 @Composable
 fun MerchantInputScreen(onPayClick: () -> Unit) {
@@ -41,19 +40,14 @@ fun MerchantInputScreen(onPayClick: () -> Unit) {
         Text("25.00", fontSize = 72.sp, fontWeight = FontWeight.Bold, color = Forest, letterSpacing = (-2).sp)
         Text("Lunch Combo", fontSize = 18.sp, color = TextGray)
         Spacer(modifier = Modifier.weight(1f))
+
         WisePrimaryButton(text = "Charge €25.00", onClick = onPayClick)
         Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
 @Composable
-fun MerchantSuccessScreen(
-    amount: String,
-    currencyCode: String,
-    onReset: () -> Unit
-) {
-    val symbol = CurrencyUtils.getSymbolForCode(currencyCode)
-
+fun MerchantSuccessScreen(onReset: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -62,22 +56,12 @@ fun MerchantSuccessScreen(
         val context = LocalContext.current
         val imageResId = remember(context) { context.resources.getIdentifier("coin_pile_up", "drawable", context.packageName) }
 
-        if (imageResId != 0) {
-            Image(painterResource(imageResId), null, Modifier.size(120.dp))
-        } else {
-            Box(Modifier.size(80.dp).background(PaleGreen, CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.ArrowDownward, null, tint = Forest, modifier = Modifier.size(40.dp)) }
-        }
+        if (imageResId != 0) Image(painterResource(imageResId), null, Modifier.size(120.dp))
+        else Box(Modifier.size(80.dp).background(PaleGreen, CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.ArrowDownward, null, tint = Forest, modifier = Modifier.size(40.dp)) }
 
         Spacer(Modifier.height(24.dp))
         Text("Payment Received", fontSize = 24.sp, color = Forest, fontWeight = FontWeight.Bold)
-
-        Text(
-            text = "Received $symbol$amount",
-            color = TextGray,
-            fontSize = 18.sp,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-
+        Text("Transaction #8492 completes", color = TextGray)
         Spacer(Modifier.height(64.dp))
         WiseOutlineButton(text = "New Sale", onClick = onReset)
     }

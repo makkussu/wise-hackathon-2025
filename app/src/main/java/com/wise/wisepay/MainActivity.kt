@@ -26,9 +26,8 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
     private var nfcAdapter: NfcAdapter? = null
     private val appState = mutableStateOf(PosState.INPUT)
 
-    private var transactionAmount = mutableStateOf("0,00")
-    private var transactionCurrencyCode = mutableStateOf("EUR")
-    private var transactionDescription = mutableStateOf("")
+    private var transactionAmount = mutableStateOf("0.00")
+    private var transactionCurrency = mutableStateOf("EUR")
 
     private var transactionFlag = mutableIntStateOf(currenciesList[1].flag)
 
@@ -37,7 +36,9 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
 
         setContent {
-            MaterialTheme(typography = WiseTypography) {
+            MaterialTheme(
+                typography = WiseTypography
+            ) {
                 Surface(modifier = Modifier.fillMaxSize(), color = GrayBg) {
                     val currentState = appState.value
 
@@ -62,11 +63,11 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
 
                         onReset = { appState.value = PosState.INPUT },
                         onPaymentSuccess = {
-                            vibratePhone(true)
+                            vibratePhone(success = true)
                             appState.value = PosState.CUSTOMER_SUCCESS
                         },
                         onPaymentError = {
-                            vibratePhone(false)
+                            vibratePhone(success = false)
                             appState.value = PosState.PAYMENT_ERROR
                         },
                         onRetry = { appState.value = PosState.PAYING }
@@ -91,14 +92,16 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
         super.onResume()
         nfcAdapter?.enableReaderMode(this, this, NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK, null)
     }
+
     override fun onPause() {
         super.onPause()
         nfcAdapter?.disableReaderMode(this)
     }
+
     override fun onTagDiscovered(tag: Tag?) {
         if (appState.value == PosState.PAYING) {
             runOnUiThread {
-                vibratePhone(true)
+                vibratePhone(success = true)
                 appState.value = PosState.CUSTOMER_SUCCESS
             }
         }

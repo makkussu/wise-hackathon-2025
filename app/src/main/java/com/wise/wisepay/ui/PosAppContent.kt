@@ -62,12 +62,15 @@ fun MainAppContent(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .graphicsLayer { rotationX = rotation; cameraDistance = 32f * density },
+            .graphicsLayer {
+                rotationX = rotation
+                cameraDistance = 32f * density
+            },
         contentAlignment = Alignment.Center
     ) {
         if (rotation <= 90f) {
             if (currentState == PosState.MERCHANT_SUCCESS) {
-                MerchantSuccessScreen(amount, currencyCode, onReset)
+                MerchantSuccessScreen(onReset)
             } else {
                 WayPosConfirmScreen(
                     onConfirm = { amt, curr, flag ->
@@ -89,10 +92,10 @@ fun MainAppContent(
                     ) { tapCount++ }
             ) {
                 when (currentState) {
-                    PosState.CUSTOMER_SUCCESS, PosState.MERCHANT_SUCCESS -> CustomerSuccessView(amount, currencyCode)
+                    PosState.CUSTOMER_SUCCESS, PosState.MERCHANT_SUCCESS -> CustomerSuccessView()
                     PosState.PAYMENT_ERROR, PosState.INPUT -> CustomerErrorScreen(onRetry, onReset)
 
-                    else -> CustomerPaymentScreen(amount, currency, description, flagResId)
+                    else -> CustomerPaymentScreen(amount, currency, flagResId)
                 }
             }
         }
