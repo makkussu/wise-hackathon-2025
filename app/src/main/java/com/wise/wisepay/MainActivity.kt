@@ -25,17 +25,16 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
     private var nfcAdapter: NfcAdapter? = null
     private val appState = mutableStateOf(PosState.INPUT)
 
-    private var transactionAmount = mutableStateOf("0.00")
-    private var transactionCurrency = mutableStateOf("EUR")
+    private var transactionAmount = mutableStateOf("0,00")
+    private var transactionCurrencyCode = mutableStateOf("EUR")
+    private var transactionDescription = mutableStateOf("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
 
         setContent {
-            MaterialTheme(
-                typography = WiseTypography
-            ) {
+            MaterialTheme(typography = WiseTypography) {
                 Surface(modifier = Modifier.fillMaxSize(), color = GrayBg) {
                     val currentState = appState.value
 
@@ -49,21 +48,23 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                     MainAppContent(
                         currentState = currentState,
                         amount = transactionAmount.value,
-                        currency = transactionCurrency.value,
+                        currencyCode = transactionCurrencyCode.value,
+                        description = transactionDescription.value,
 
-                        onConfirmInput = { amount, currency ->
-                            transactionAmount.value = amount
-                            transactionCurrency.value = currency
+                        onConfirmInput = { amt, currCode, desc ->
+                            transactionAmount.value = amt
+                            transactionCurrencyCode.value = currCode
+                            transactionDescription.value = desc
                             appState.value = PosState.PAYING
                         },
 
                         onReset = { appState.value = PosState.INPUT },
                         onPaymentSuccess = {
-                            vibratePhone(success = true)
+                            vibratePhone(true)
                             appState.value = PosState.CUSTOMER_SUCCESS
                         },
                         onPaymentError = {
-                            vibratePhone(success = false)
+                            vibratePhone(false)
                             appState.value = PosState.PAYMENT_ERROR
                         },
                         onRetry = { appState.value = PosState.PAYING }
@@ -88,16 +89,14 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
         super.onResume()
         nfcAdapter?.enableReaderMode(this, this, NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK, null)
     }
-
     override fun onPause() {
         super.onPause()
         nfcAdapter?.disableReaderMode(this)
     }
-
     override fun onTagDiscovered(tag: Tag?) {
         if (appState.value == PosState.PAYING) {
             runOnUiThread {
-                vibratePhone(success = true)
+                vibratePhone(true)
                 appState.value = PosState.CUSTOMER_SUCCESS
             }
         }

@@ -24,8 +24,9 @@ import kotlinx.coroutines.delay
 fun MainAppContent(
     currentState: PosState,
     amount: String,
-    currency: String,
-    onConfirmInput: (String, String) -> Unit,
+    currencyCode: String,
+    description: String,
+    onConfirmInput: (String, String, String) -> Unit,
     onReset: () -> Unit,
     onPaymentSuccess: () -> Unit,
     onPaymentError: () -> Unit,
@@ -61,24 +62,16 @@ fun MainAppContent(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .graphicsLayer {
-                rotationX = rotation
-                cameraDistance = 32f * density
-            },
+            .graphicsLayer { rotationX = rotation; cameraDistance = 32f * density },
         contentAlignment = Alignment.Center
     ) {
         if (rotation <= 90f) {
             if (currentState == PosState.MERCHANT_SUCCESS) {
-                MerchantSuccessScreen(onReset)
+                MerchantSuccessScreen(amount, currencyCode, onReset)
             } else {
-                WayPosConfirmScreen(
-                    onConfirm = { amt, curr ->
-                        onConfirmInput(amt, curr)
-                    }
-                )
+                WayPosConfirmScreen(onConfirm = onConfirmInput)
             }
-        }
-        else {
+        } else {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -90,10 +83,9 @@ fun MainAppContent(
                     ) { tapCount++ }
             ) {
                 when (currentState) {
-                    PosState.CUSTOMER_SUCCESS, PosState.MERCHANT_SUCCESS -> CustomerSuccessView()
+                    PosState.CUSTOMER_SUCCESS, PosState.MERCHANT_SUCCESS -> CustomerSuccessView(amount, currencyCode)
                     PosState.PAYMENT_ERROR, PosState.INPUT -> CustomerErrorScreen(onRetry, onReset)
-
-                    else -> CustomerPaymentScreen(amount, currency)
+                    else -> CustomerPaymentScreen(amount, currencyCode, description)
                 }
             }
         }
