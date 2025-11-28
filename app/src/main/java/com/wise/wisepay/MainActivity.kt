@@ -59,12 +59,15 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                     bodyLarge = TextStyle(fontFamily = InterFont),
                     displayLarge = TextStyle(fontFamily = InterFont)
                 )
-            ) {
-                SimpleNfcApp(
-                    nfcTrigger = nfcTrigger,
-                    setScanningState = { active -> isReadyToScan = active },
-                    onSimulateSignal = { simulateSignal(this) }
-                )
+            ) {// БЫЛО:
+            // SimpleNfcApp(
+            //    nfcTrigger = nfcTrigger,
+            //    setScanningState = { active -> isReadyToScan = active },
+            //    onSimulateSignal = { simulateSignal(this) }
+            // )
+
+            // СТАЛО (замените на это):
+            SalesStatsScreen()
             }
         }
     }
