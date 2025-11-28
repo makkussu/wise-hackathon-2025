@@ -26,8 +26,12 @@ import com.wise.wisepay.ui.components.SwayingCardIcon
 import com.wise.wisepay.ui.components.WisePrimaryButton
 import com.wise.wisepay.ui.theme.*
 
+
 @Composable
-fun CustomerPaymentScreen() {
+fun CustomerPaymentScreen(
+    amount: String,
+    currency: String
+) {
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -39,15 +43,19 @@ fun CustomerPaymentScreen() {
             modifier = Modifier.size(56.dp).clip(CircleShape).background(White).padding(2.dp).clip(CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            val context = LocalContext.current
-            val flagResId = remember(context) { context.resources.getIdentifier("flag_eu", "drawable", context.packageName) }
-            if (flagResId != 0) Image(painterResource(flagResId), null, Modifier.fillMaxSize(), contentScale = androidx.compose.ui.layout.ContentScale.Crop)
-            else Text("🇪🇺", fontSize = 32.sp)
+            Text("🇪🇺", fontSize = 32.sp)
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("€25.00", color = White, fontSize = 72.sp, fontWeight = FontWeight.Bold, letterSpacing = (-3).sp)
-        Text("Lunch Combo", color = White.copy(alpha = 0.7f), fontSize = 18.sp)
+        Text(
+            text = "$amount $currency",
+            color = White,
+            fontSize = 72.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-3).sp,
+            lineHeight = 72.sp
+        )
+        Text("Total to pay", color = White.copy(alpha = 0.7f), fontSize = 18.sp)
 
         Spacer(modifier = Modifier.height(56.dp))
         SwayingCardIcon()
@@ -56,6 +64,7 @@ fun CustomerPaymentScreen() {
         Spacer(modifier = Modifier.weight(1.2f))
     }
 }
+
 
 @Composable
 fun CustomerSuccessView() {

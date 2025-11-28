@@ -17,12 +17,15 @@ import com.wise.wisepay.model.PosState
 import com.wise.wisepay.ui.screens.*
 import com.wise.wisepay.ui.theme.Forest
 import com.wise.wisepay.ui.theme.White
+import com.wise.wisepay.ui.theme.WayPosConfirmScreen
 import kotlinx.coroutines.delay
 
 @Composable
 fun MainAppContent(
     currentState: PosState,
-    onStartPayment: () -> Unit,
+    amount: String,
+    currency: String,
+    onConfirmInput: (String, String) -> Unit,
     onReset: () -> Unit,
     onPaymentSuccess: () -> Unit,
     onPaymentError: () -> Unit,
@@ -39,9 +42,7 @@ fun MainAppContent(
         label = "Flip"
     )
 
-    val backgroundColor = if (rotation <= 90f) {
-        White
-    } else {
+    val backgroundColor = if (rotation <= 90f) White else {
         if (currentState == PosState.PAYING) Forest else White
     }
 
@@ -70,7 +71,11 @@ fun MainAppContent(
             if (currentState == PosState.MERCHANT_SUCCESS) {
                 MerchantSuccessScreen(onReset)
             } else {
-                MerchantInputScreen(onStartPayment)
+                WayPosConfirmScreen(
+                    onConfirm = { amt, curr ->
+                        onConfirmInput(amt, curr)
+                    }
+                )
             }
         }
         else {
@@ -86,10 +91,9 @@ fun MainAppContent(
             ) {
                 when (currentState) {
                     PosState.CUSTOMER_SUCCESS, PosState.MERCHANT_SUCCESS -> CustomerSuccessView()
-
                     PosState.PAYMENT_ERROR, PosState.INPUT -> CustomerErrorScreen(onRetry, onReset)
 
-                    else -> CustomerPaymentScreen()
+                    else -> CustomerPaymentScreen(amount, currency)
                 }
             }
         }
