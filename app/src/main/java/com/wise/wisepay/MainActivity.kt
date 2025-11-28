@@ -1,8 +1,6 @@
 package com.wise.wisepay
 
 import android.content.Context
-import android.media.AudioManager
-import android.media.ToneGenerator
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.os.Build
@@ -45,44 +43,54 @@ val InterFont = FontFamily.SansSerif
 class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
 
     private var nfcAdapter: NfcAdapter? = null
-    private val nfcTrigger = mutableStateOf(false)
-    private var isReadyToScan = false
+    private val appState = mutableStateOf(PosState.INPUT)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
 
         setContent {
-            MaterialTheme(
-                typography = Typography(
-                    bodyLarge = TextStyle(fontFamily = InterFont),
-                    displayLarge = TextStyle(fontFamily = InterFont)
-                )
-            ) {
-                SimpleNfcApp(
-                    nfcTrigger = nfcTrigger,
-                    setScanningState = { active -> isReadyToScan = active },
-                    onSimulateSignal = { simulateSignal(this) }
-                )
+            MaterialTheme (
+                typography = WiseTypography
+            ){
+                Surface(modifier = Modifier.fillMaxSize(), color = GrayBg) {
+                    val currentState = appState.value
+
+                    LaunchedEffect(currentState) {
+                        if (currentState == PosState.CUSTOMER_SUCCESS) {
+                            delay(2500)
+                            appState.value = PosState.MERCHANT_SUCCESS
+                        }
+                    }
+
+                    MainAppContent(
+                        currentState = currentState,
+                        onStartPayment = { appState.value = PosState.PAYING },
+                        onReset = { appState.value = PosState.INPUT },
+                        onPaymentSuccess = {
+                            vibratePhone(success = true)
+                            appState.value = PosState.CUSTOMER_SUCCESS
+                        },
+                        onPaymentError = {
+                            vibratePhone(success = false)
+                            appState.value = PosState.PAYMENT_ERROR
+                        },
+                        onRetry = { appState.value = PosState.PAYING }
+                    )
+                }
             }
         }
     }
 
-    private fun simulateSignal(context: Context) {
-        try {
-            val tone = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
-            tone.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
-        } catch (e: Exception) { }
-
-        try {
-            val v = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            if (Build.VERSION.SDK_INT >= 26) {
-                v.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
-            } else {
-                @Suppress("DEPRECATION")
-                v.vibrate(200)
-            }
-        } catch (e: Exception) { }
+    private fun vibratePhone(success: Boolean) {
+        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        if (Build.VERSION.SDK_INT >= 26) {
+            val amplitude = if (success) VibrationEffect.DEFAULT_AMPLITUDE else 255
+            val timing = if (success) 150L else 500L
+            vibrator.vibrate(VibrationEffect.createOneShot(timing, amplitude))
+        } else {
+            vibrator.vibrate(500)
+        }
     }
 
     override fun onResume() {
