@@ -1,6 +1,5 @@
 package com.wise.wisepay.ui.screens
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,7 +12,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,31 +26,20 @@ import androidx.compose.ui.unit.sp
 import com.wise.wisepay.ui.components.SwayingCardIcon
 import com.wise.wisepay.ui.components.WisePrimaryButton
 import com.wise.wisepay.ui.theme.*
-import com.wise.wisepay.util.CurrencyUtils
+
 
 @Composable
 fun CustomerPaymentScreen(
     amount: String,
-    currencyCode: String,
+    currency: String,
     flagResId: Int
-    description: String
 ) {
-    val flag = CurrencyUtils.getFlagForCode(currencyCode)
-    val symbol = CurrencyUtils.getSymbolForCode(currencyCode)
-
-    val fullAmountText = "$symbol$amount"
-
-
-    val amountFontSize by animateFloatAsState(
-        targetValue = when {
-            fullAmountText.length > 10 -> 40f
-            fullAmountText.length > 7 -> 54f
-            else -> 72f
-        },
-        label = "CustomerFontSize"
-    )
-
-    Column(modifier = Modifier.fillMaxSize().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text("Wise POS", color = White.copy(alpha = 0.5f), fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 32.dp))
         Spacer(modifier = Modifier.weight(1f))
 
@@ -75,21 +62,14 @@ fun CustomerPaymentScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = fullAmountText,
+            text = "$currency$amount",
             color = White,
-            fontSize = amountFontSize.sp,
+            fontSize = 72.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = (-3).sp,
-            lineHeight = amountFontSize.sp,
-            maxLines = 1,
-            softWrap = false
+            lineHeight = 72.sp
         )
-
-        Text(
-            text = description.ifEmpty { "Total to pay" },
-            color = White.copy(alpha = 0.7f),
-            fontSize = 18.sp
-        )
+        Text("Total to pay", color = White.copy(alpha = 0.7f), fontSize = 18.sp)
 
         Spacer(modifier = Modifier.height(56.dp))
         SwayingCardIcon()
@@ -99,11 +79,14 @@ fun CustomerPaymentScreen(
     }
 }
 
-@Composable
-fun CustomerSuccessView(amount: String, currencyCode: String) {
-    val symbol = CurrencyUtils.getSymbolForCode(currencyCode)
 
-    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+@Composable
+fun CustomerSuccessView() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
         val context = LocalContext.current
         val iconResId = remember(context) { context.resources.getIdentifier("wise_success_icon", "drawable", context.packageName) }
 
@@ -112,7 +95,7 @@ fun CustomerSuccessView(amount: String, currencyCode: String) {
 
         Spacer(modifier = Modifier.height(32.dp))
         Text("Approved", color = Forest, fontSize = 32.sp, fontWeight = FontWeight.Bold)
-        Text("$symbol$amount paid", color = TextGray, fontSize = 20.sp, modifier = Modifier.padding(top = 8.dp))
+        Text("Payment successful", color = TextGray, fontSize = 20.sp, modifier = Modifier.padding(top = 8.dp))
     }
 }
 
