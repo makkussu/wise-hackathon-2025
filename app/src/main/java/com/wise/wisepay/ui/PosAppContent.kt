@@ -25,11 +25,12 @@ fun MainAppContent(
     currentState: PosState,
     amount: String,
     currency: String,
-    onConfirmInput: (String, String) -> Unit,
+    onConfirmInput: (String, String, Int) -> Unit,
     onReset: () -> Unit,
     onPaymentSuccess: () -> Unit,
     onPaymentError: () -> Unit,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
+    flagResId: Int
 ) {
     val targetRotation = when (currentState) {
         PosState.INPUT, PosState.MERCHANT_SUCCESS -> 0f
@@ -72,12 +73,13 @@ fun MainAppContent(
                 MerchantSuccessScreen(onReset)
             } else {
                 WayPosConfirmScreen(
-                    onConfirm = { amt, curr ->
-                        onConfirmInput(amt, curr)
+                    onConfirm = { amt, curr, flag ->
+                        onConfirmInput(amt, curr, flag)
                     }
                 )
             }
         }
+
         else {
             Box(
                 modifier = Modifier
@@ -93,7 +95,7 @@ fun MainAppContent(
                     PosState.CUSTOMER_SUCCESS, PosState.MERCHANT_SUCCESS -> CustomerSuccessView()
                     PosState.PAYMENT_ERROR, PosState.INPUT -> CustomerErrorScreen(onRetry, onReset)
 
-                    else -> CustomerPaymentScreen(amount, currency)
+                    else -> CustomerPaymentScreen(amount, currency, flagResId)
                 }
             }
         }

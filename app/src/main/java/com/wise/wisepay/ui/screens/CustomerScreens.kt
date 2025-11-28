@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,25 +31,38 @@ import com.wise.wisepay.ui.theme.*
 @Composable
 fun CustomerPaymentScreen(
     amount: String,
-    currency: String
+    currency: String,
+    flagResId: Int
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Wise POS", color = White.copy(alpha = 0.5f), fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 32.dp))
         Spacer(modifier = Modifier.weight(1f))
 
         Box(
-            modifier = Modifier.size(56.dp).clip(CircleShape).background(White).padding(2.dp).clip(CircleShape),
+            modifier = Modifier
+                .size(64.dp)
+                .clip(CircleShape)
+                .background(White)
+                .padding(2.dp)
+                .clip(CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            Text("🇪🇺", fontSize = 32.sp)
+            Image(
+                painter = painterResource(id = flagResId),
+                contentDescription = "Flag",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "$amount $currency",
+            text = "$currency$amount",
             color = White,
             fontSize = 72.sp,
             fontWeight = FontWeight.Bold,
@@ -81,14 +95,17 @@ fun CustomerSuccessView() {
 
         Spacer(modifier = Modifier.height(32.dp))
         Text("Approved", color = Forest, fontSize = 32.sp, fontWeight = FontWeight.Bold)
-        Text("€25.00 paid", color = TextGray, fontSize = 20.sp, modifier = Modifier.padding(top = 8.dp))
+        Text("Payment successful", color = TextGray, fontSize = 20.sp, modifier = Modifier.padding(top = 8.dp))
     }
 }
 
 @Composable
 fun CustomerErrorScreen(onRetry: () -> Unit, onCancel: () -> Unit) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp).windowInsetsPadding(WindowInsets.safeDrawing)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp)
+            .windowInsetsPadding(WindowInsets.safeDrawing)
     ) {
         Box(Modifier.fillMaxWidth()) {
             IconButton(onClick = onCancel, modifier = Modifier.align(Alignment.CenterStart)) {

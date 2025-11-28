@@ -18,6 +18,7 @@ import com.wise.wisepay.model.PosState
 import com.wise.wisepay.ui.MainAppContent
 import com.wise.wisepay.ui.theme.GrayBg
 import com.wise.wisepay.ui.theme.WiseTypography
+import com.wise.wisepay.ui.theme.currenciesList
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
@@ -27,6 +28,8 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
 
     private var transactionAmount = mutableStateOf("0.00")
     private var transactionCurrency = mutableStateOf("EUR")
+
+    private var transactionFlag = mutableIntStateOf(currenciesList[1].flag)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,10 +53,11 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                         currentState = currentState,
                         amount = transactionAmount.value,
                         currency = transactionCurrency.value,
-
-                        onConfirmInput = { amount, currency ->
+                        flagResId = transactionFlag.value,
+                        onConfirmInput = { amount, currency, flag ->
                             transactionAmount.value = amount
                             transactionCurrency.value = currency
+                            transactionFlag.value = flag
                             appState.value = PosState.PAYING
                         },
 
